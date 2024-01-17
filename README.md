@@ -26,6 +26,7 @@ This project is maintained by:
 ## Built with
 
 - [Kotlin](https://kotlinlang.org/) - For coding.
+- [Biometrics](https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=&ved=2ahUKEwid1Yf_yuWDAxWKI0QIHSOBCGYQFnoECB0QAQ&url=https%3A%2F%2Fdeveloper.android.com%2Ftraining%2Fsign-in%2Fbiometric-auth&usg=AOvVaw22cCsU2TGbWKbVju6-Jd3J&opi=89978449)
 - Jetpack
     - [Compose](https://developer.android.com/jetpack/compose?gclid=CjwKCAiAzKqdBhAnEiwAePEjkkbfP8b_r6c57F3jtdwOjxWpBbNOXVmpSnAUu4HKCid7KtSvfiiYeRoC1wYQAvD_BwE&gclsrc=aw.ds)
         - Android’s recommended modern toolkit for building native UI.
