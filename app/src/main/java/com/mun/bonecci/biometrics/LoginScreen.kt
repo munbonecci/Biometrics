@@ -1,5 +1,6 @@
 package com.mun.bonecci.biometrics
 
+import android.annotation.SuppressLint
 import android.content.Context
 import androidx.biometric.BiometricPrompt
 import androidx.compose.foundation.layout.Arrangement
@@ -51,8 +52,9 @@ private var ciphertextWrapper: CiphertextWrapper? = null
  *
  * @param navController The navigation controller to handle navigation actions.
  */
+@SuppressLint("RestrictedApi")
 @Composable
-fun LoginScreen(navController: NavHostController, initCallback: (BiometricAuthListener) -> Unit) {
+fun LoginScreen(navController: NavHostController) {
 
     // State variables to store user input for name and age
     var email by remember { mutableStateOf(TextFieldValue()) }
@@ -61,32 +63,34 @@ fun LoginScreen(navController: NavHostController, initCallback: (BiometricAuthLi
     var isPasswordValid by remember { mutableStateOf(false) }
     val context = LocalContext.current
     val isBiometricReady = BiometricUtils.isBiometricReady(context)
-    var authenticationResult by remember {
-        mutableStateOf<BiometricPrompt.AuthenticationResult?>(null)
-    }
-    var authenticationError by remember { mutableStateOf<Pair<Int, String>?>(null) }
-    var authenticationFailed by remember { mutableStateOf(false) }
-
-    // Initialize the callback using the higher-order function
-    val callback = remember {
-        object : BiometricAuthListener {
-            override fun onBiometricAuthenticateError(error: Int, errMsg: String) {
-                authenticationError = Pair(error, errMsg)
-            }
-
-            override fun onAuthenticationFailed() {
-                authenticationFailed = true
-            }
-
-            override fun onBiometricAuthenticateSuccess(result: BiometricPrompt.AuthenticationResult) {
-                authenticationResult = result
-            }
-        }
-    }
+    var isLoginFromModal by remember { mutableStateOf(false) }
 
     // Execute the provided initialization function
-    initCallback(callback)
-    InitBiometrics(context = context, callback = callback)
+    InitBiometrics(
+        context = context as FragmentActivity,
+        callback = object : BiometricAuthListener {
+            override fun onBiometricAuthenticateError(error: Int, errMsg: String) {
+                when (error) {
+                    BiometricPrompt.ERROR_USER_CANCELED -> {}
+                    BiometricPrompt.ERROR_NEGATIVE_BUTTON -> {}
+                    BiometricPrompt.ERROR_NO_BIOMETRICS -> {}
+                }
+            }
+
+            override fun onAuthenticationFailed() {}
+
+            override fun onBiometricAuthenticateSuccess(result: BiometricPrompt.AuthenticationResult) {
+                if (isLoginFromModal) {
+                    val token = "${email.text} ${password.text}"
+                    BiometricUtils.encryptAndStoreServerToken(token, context, result)
+                    goToResultScreen(navController, email.text, password.text)
+                } else {
+                    BiometricUtils.decryptServerToken(context, result).run {
+                        goToResultScreen(navController, first, second)
+                    }
+                }
+            }
+        })
     useBiometrics()
 
     // Card composable for visual styling
@@ -107,7 +111,7 @@ fun LoginScreen(navController: NavHostController, initCallback: (BiometricAuthLi
             // Text field for entering user email
             EmailTextField(email = email, onEmailChange = {
                 email = it
-                isEmailValid = it.text.isValidEmail()
+                isEmailValid = it.text.trim().isValidEmail()
             })
 
             // Text field for entering user password
@@ -125,6 +129,7 @@ fun LoginScreen(navController: NavHostController, initCallback: (BiometricAuthLi
                 onClick = {
                     if (isEmailValid && isPasswordValid) {
                         showBiometricPromptForEncryption(context = context)
+                        isLoginFromModal = true
                     }
                 },
                 modifier = Modifier
@@ -135,31 +140,16 @@ fun LoginScreen(navController: NavHostController, initCallback: (BiometricAuthLi
             }
         }
     }
+}
 
-    // Display authentication result or error
-    authenticationResult?.let { result ->
-        val token = "${email.text} ${password.text}"
-        BiometricUtils.encryptAndStoreServerToken(token, context, result)
-        navController.navigate("${NavigationItem.ResultScreen.route}/${email.text}/${password.text}")
-    }
-
-    authenticationError?.let { (errorCode: Int, errorMessage: String) ->
-        when (errorCode) {
-            BiometricPrompt.ERROR_USER_CANCELED -> {}
-            BiometricPrompt.ERROR_NEGATIVE_BUTTON -> {}
-            BiometricPrompt.ERROR_NO_BIOMETRICS -> {}
-        }
-    }
-
-    if (authenticationFailed) {
-        Text("Authentication Failed")
-    }
+private fun goToResultScreen(navController: NavHostController, email: String, password: String) {
+    navController.navigate("${NavigationItem.ResultScreen.route}/${email}/${password}")
 }
 
 @Composable
-private fun InitBiometrics(context: Context, callback: BiometricAuthListener) {
+private fun InitBiometrics(context: FragmentActivity, callback: BiometricAuthListener) {
     biometricPrompt =
-        BiometricUtils.initBiometricPrompt(context as FragmentActivity, callback)
+        BiometricUtils.initBiometricPrompt(context, callback)
 
     promptInfo = BiometricUtils.createPromptInfo(
         title = "Biometric Example",

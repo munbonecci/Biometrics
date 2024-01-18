@@ -7,7 +7,7 @@ import java.util.regex.Pattern
  * Extension function to check if the [TextFieldValue] represents a valid password.
  */
 fun TextFieldValue.isValidPassword(): Boolean {
-    val password = text
+    val password = text.trim()
     val passwordRegex =
         Pattern.compile("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$")
 
