@@ -14,6 +14,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -37,6 +38,7 @@ import com.mun.bonecci.biometrics.commons.isValidPassword
 import com.mun.bonecci.biometrics.components.EmailTextField
 import com.mun.bonecci.biometrics.components.PasswordTextField
 import com.mun.bonecci.biometrics.navigation.NavigationItem
+import kotlinx.coroutines.launch
 
 private lateinit var biometricPrompt: BiometricPrompt
 private val cryptographyManager = CryptographyManager()
@@ -91,7 +93,10 @@ fun LoginScreen(navController: NavHostController) {
                 }
             }
         })
-    useBiometrics()
+
+    LaunchedEffect(Unit) {
+        launch { useBiometrics() }
+    }
 
     // Card composable for visual styling
     Card(
