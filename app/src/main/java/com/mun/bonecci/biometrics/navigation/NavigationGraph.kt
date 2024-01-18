@@ -4,8 +4,8 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
-import androidx.navigation.navArgument
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import com.mun.bonecci.biometrics.LoginScreen
 import com.mun.bonecci.biometrics.ResultScreen
 
@@ -22,7 +22,7 @@ fun NavigationGraph(navController: NavHostController) {
         // Define the composable for Login Screen
         composable(NavigationItem.LoginScreen.route) {
             // Call the appropriate Login Screen content here
-            LoginScreen(navController)
+            LoginScreen(navController) {}
         }
 
         // Define the composable for ScreenB with a dynamic parameter (email, password)

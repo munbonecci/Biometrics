@@ -33,7 +33,7 @@ class MainActivity : ComponentActivity() {
 
 @Preview(showBackground = true)
 @Composable
-fun GreetingPreview() {
+fun BiometricPreview() {
     BiometricsTheme {
         val navController = rememberNavController()
         NavigationGraph(navController = navController)
