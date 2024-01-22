@@ -39,3 +39,6 @@ This project is maintained by:
 - Open it in Android Studio
 - Wait until dependencies are installed
 - Run app in your emulator or physical device
+
+![App Screens](app/app-image.png)
+![App Screens](app/app-image2.png)
