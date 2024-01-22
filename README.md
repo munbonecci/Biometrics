@@ -1,7 +1,7 @@
 <h1 align="center">Biometrics</h1> 
 
 <p align="center">
-This app was created to learn more about Android compose using Biometrics
+This app was created to implement encrypted biometric authentication in Jetpack Compose.
 </p>
 
 ## Installation
