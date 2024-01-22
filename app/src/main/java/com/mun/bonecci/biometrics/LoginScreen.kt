@@ -24,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.fragment.app.FragmentActivity
 import androidx.navigation.NavHostController
 import com.mun.bonecci.biometrics.biometric.BiometricAuthListener
@@ -113,6 +114,12 @@ fun LoginScreen(navController: NavHostController) {
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            Text(
+                text = "Biometric",
+                modifier = Modifier.padding(all = 16.dp),
+                fontSize = 24.sp
+            )
+
             // Text field for entering user email
             EmailTextField(email = email, onEmailChange = {
                 email = it
