@@ -13,18 +13,36 @@ import androidx.fragment.app.FragmentActivity
 object BiometricUtils {
 
     /**
-     * Check whether the Device is Capable of the Biometric
+     * Checks whether the device is capable of biometric authentication.
+     *
+     * @param context The context to retrieve biometric capability information.
+     * @return A constant indicating the biometric capability status. Possible values:
+     *         [BiometricManager.BIOMETRIC_SUCCESS] - The device supports biometric authentication.
+     *         [BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE] - The device does not have biometric hardware.
+     *         [BiometricManager.BIOMETRIC_ERROR_HW_UNAVAILABLE] - Biometric hardware is currently unavailable.
+     *         [BiometricManager.BIOMETRIC_ERROR_UNSUPPORTED] - The device does not support the required features.
      */
     private fun hasBiometricCapability(context: Context): Int {
         return BiometricManager.from(context)
             .canAuthenticate(BIOMETRIC_STRONG or DEVICE_CREDENTIAL or BIOMETRIC_WEAK)
     }
 
-    fun isBiometricReady(context: Context) =
+    /**
+     * Checks whether the device is ready for biometric authentication.
+     *
+     * @param context The context to check biometric readiness.
+     * @return `true` if the device is ready for biometric authentication, otherwise `false`.
+     */
+    fun isBiometricReady(context: Context): Boolean =
         hasBiometricCapability(context) == BiometricManager.BIOMETRIC_SUCCESS
 
+
     /**
-     * Initiate the Biometric Prompt
+     * Initializes a [BiometricPrompt] instance for biometric authentication.
+     *
+     * @param activity The [FragmentActivity] context.
+     * @param listener The listener for biometric authentication events.
+     * @return Configured [BiometricPrompt] instance.
      */
     @Composable
     fun initBiometricPrompt(
@@ -33,16 +51,30 @@ object BiometricUtils {
     ): BiometricPrompt {
         val executor = ContextCompat.getMainExecutor(activity)
         val callback = object : BiometricPrompt.AuthenticationCallback() {
+            /**
+             * Called when an error occurs during authentication.
+             *
+             * @param errorCode The error code representing the type of error.
+             * @param errString A human-readable error message.
+             */
             override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
                 super.onAuthenticationError(errorCode, errString)
                 listener.onBiometricAuthenticateError(errorCode, errString.toString())
             }
 
+            /**
+             * Called when authentication fails.
+             */
             override fun onAuthenticationFailed() {
                 super.onAuthenticationFailed()
                 listener.onAuthenticationFailed()
             }
 
+            /**
+             * Called when authentication is successful.
+             *
+             * @param result The authentication result containing additional information.
+             */
             override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
                 super.onAuthenticationSucceeded(result)
                 listener.onBiometricAuthenticateSuccess(result)
@@ -51,8 +83,14 @@ object BiometricUtils {
         return BiometricPrompt(activity, executor, callback)
     }
 
+
     /**
-     * Display the Biometric Prompt
+     * Creates a BiometricPrompt.PromptInfo for displaying the biometric prompt.
+     *
+     * @param title The title to be displayed in the biometric prompt.
+     * @param description The description to be displayed in the biometric prompt.
+     * @param negativeText The text for the negative button in the biometric prompt.
+     * @return Configured [BiometricPrompt.PromptInfo] instance.
      */
     fun createPromptInfo(
         title: String,
@@ -65,7 +103,14 @@ object BiometricUtils {
             negativeText
         )
 
-    //setting up a biometric
+    /**
+     * Sets up a BiometricPrompt.PromptInfo with the specified parameters.
+     *
+     * @param title The title to be displayed in the biometric prompt.
+     * @param description The description to be displayed in the biometric prompt.
+     * @param negativeText The text for the negative button in the biometric prompt.
+     * @return Configured [BiometricPrompt.PromptInfo] instance.
+     */
     private fun setBiometricPromptInfo(
         title: String,
         description: String,
@@ -78,6 +123,7 @@ object BiometricUtils {
             .setConfirmationRequired(false)
             .build()
     }
+
 
     /**
      * Encrypt and store credentials in preferences with cipher
